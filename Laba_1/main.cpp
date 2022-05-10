@@ -1,90 +1,84 @@
-#include <QCoreApplication>
-//#include <fstream>
 #include <iostream>
-//#include <stack>
-#include <exception>
 using namespace std;
 
-class Stack_init
-{
-    char* stck; //непосредственно стэк
-    int tos;    //счетчик
+const int SIZE = 100;
 
-    //Параметрический конструктор класса Stack
+template <class SType> class stack {
+	SType stck[SIZE];	//инициализация стека размером SIZE = 100
+	int tos;			//текущее количество элементов в стеке	
 public:
-
-    Stack_init(int size) {
-        stck = new char[size];
-        tos = 0;
-    }
-    //Метод помещает в неполный стек элемент
-    void push(char ch)
-    {
-        if (tos == sizeof(stck))
-        {
-            cout << ("Stack full");
-            return;
-        }
-        stck[tos] = ch;
-        tos++;
-    }
-    //Метод отдаёт из непустого стека элемент
-    char pop()
-    {
-        if (tos == 0)
-        {
-            return '0';
-            //throw exception();
-        }
-        tos--;
-        return stck[tos];
-    }
-    //Метод показывает общий объём стека
-    int volume()
-    {
-        return sizeof(stck);
-    }
-    //Метод показывает текущий объём стека
-    int kol()
-    {
-        return tos;
-    }
-    //Метод возвращает значение true, если стек полон
-    bool empty()
-    {
-        return tos == sizeof(stck);
-    }
-    //Метод возвращает значение true, если стек пуст
-    bool full()
-    {
-        return tos == 0;
-    }
+	stack();			//конструктор
+	~stack();			//деструктор
+	void push(SType i);	//добавить элемент
+	SType pop();		//достать
+	SType peek();		//узнать текущее кол-во
 };
 
-int main(int argc, char *argv[])
+// функция-конструктор stack
+template <class SType> stack<SType>::stack()
 {
-    QCoreApplication a(argc, argv);
+	tos = 0;
+	cout << "Stack Initialized\n";
+}
 
-        Stack_init stack1(10);
+// функция-деструктор stack
+template <class SType> stack<SType>::~stack()
+{
+	cout << "Stack Destroyed\n";
+}
 
-        cout << stack1.volume() << endl;
+// помещение объекта в стек
+template <class SType> void stack<SType>::push(SType i)
+{
+	if (tos == SIZE) {
+		cout << "Stack is full. \n";
+		return;
+	}
+	stck[tos] = i;
+	tos++;
+}
+// извлечение объекта из стека
+template <class SType> SType stack<SType>::pop()
+{
+	if (tos == 0) {
+		cout << "Stack underflow.\n";
+		return 0;
+	}
+	tos--;
+	return stck[tos];
+}
 
-        for (int i = 0; !stack1.empty(); i++)
-            stack1.push('A' + i);
+template <class SType> SType stack<SType>::peek() 
+{
+	return tos;
+}
 
-        cout << "Number of elements: " << stack1.kol() << endl;
+int main()
+{
+	stack<int> a; // создание целочисленного стека
+	stack<double> b; // создание вещественного стека
+	stack<char> c; //создание символьного стека
 
-        string ch;
-        for (int i = 0; !stack1.full(); i++)
-        {
-            //try {
-                ch = stack1.pop();
-                cout << ch << endl;
-            /* }
-            catch (const exception& x) {
-                cerr << "Error" << x.what() << endl;
-            }*/
-        }
+	// использование целого и вещественного стеков
+	a.push(1);
+	b.push(99.3);
+	a.push(2);
+	b.push(-12.23);
+	cout << a.peek() << " " << b.peek() << endl; // 2 2
+	cout << a.pop() << " ";
+	cout << a.pop() << "\n";
+	cout << a.peek() << " " << b.peek() << endl; // 0 2
+	cout << b.pop() << " ";
+	cout << b.pop() << "\n";
+		
+	// демонстрация символьного стека
+	for (int i = 0; i < 10; i++)
+	{
+		c.push('A' + i);
 
-    return a.exec();
+		cout << c.peek();
+	}
+
+	for (int i = 0; i < 10; i++)
+		cout << c.pop();
 }
