@@ -1,4 +1,5 @@
 #include <iostream>
+#include <exception>
 using namespace std;
 
 const int SIZE = 100;
@@ -41,7 +42,7 @@ template <class SType> void stack<SType>::push(SType i)
 template <class SType> SType stack<SType>::pop()
 {
 	if (tos == 0) {
-		cout << "Stack underflow.\n";
+		throw exception("Stack underflow.\n");		
 		return 0;
 	}
 	tos--;
@@ -70,15 +71,23 @@ int main()
 	cout << a.peek() << " " << b.peek() << endl; // 0 2
 	cout << b.pop() << " ";
 	cout << b.pop() << "\n";
-		
+
+	try {
+		cout << a.pop();
+	}
+	catch (exception x) {
+		cerr << x.what() << endl;
+	}
+			
 	// демонстрация символьного стека
 	for (int i = 0; i < 10; i++)
 	{
 		c.push('A' + i);
-
-		cout << c.peek();
 	}
+
+	cout << endl << c.peek() << endl;
 
 	for (int i = 0; i < 10; i++)
 		cout << c.pop();
+	cout << endl;
 }
