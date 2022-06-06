@@ -1,93 +1,193 @@
-#include <iostream>
+#include <QCoreApplication>
 #include <exception>
+#include<iostream>
+#include<cstring>
+#include<fstream>
+
 using namespace std;
 
-const int SIZE = 100;
-
-template <class SType> class stack {
-	SType stck[SIZE];	//инициализация стека размером SIZE = 100
-	int tos;			//текущее количество элементов в стеке	
+class EStackEmpty
+{
+private:
+    char* message;
 public:
-	stack();			//конструктор
-	~stack();			//деструктор
-	void push(SType i);	//добавить элемент
-	SType pop();		//достать
-	SType peek();		//узнать текущее кол-во
+    EStackEmpty(const char* arg_message)
+    {
+        message = new char[strlen(arg_message)+1];
+        strcpy(message,arg_message);
+    }
+    EStackEmpty(const EStackEmpty& arg)
+    {
+        message = new char[strlen(arg.message)+1];
+        strcpy(message,arg.message);
+    }
+    ~EStackEmpty()
+    {
+        delete message;
+    }
+    const char* what() const { return message; }
 };
 
-// функция-конструктор stack
-template <class SType> stack<SType>::stack()
+template <typename T>
+class Stack{
+    private:
+        T* data;
+        int capacity;
+        int length;
+        int step;
+        void expansion(){
+            capacity += step;
+            T* temp = new T[capacity];
+            for(int i = 0;i < length;i++){
+                temp[i] = data[i];
+            }
+            delete[] data;
+            data = temp;
+        }
+        void reduction(){
+            capacity -= step;
+            T* temp = new T[capacity];
+            for(int i = 0;i < length;i++){
+                temp[i] = data[i];
+            }
+            delete[] data;
+            data = temp;
+        }
+        void copy(const Stack& st){
+            delete[] data;
+            capacity = st.capacity;
+            length = st.length;
+            step = st.step;
+            data = new T[capacity];
+            for(int i = 0 ; i < length; i++){
+                data[i] = st.data[i];
+            }
+        }
+    public:
+        Stack(){
+            step = 10;
+            length = 0;
+            capacity = step;
+            data = new T[capacity];
+        }
+        void push(const T p){
+            length++;
+            data[length - 1] = p;
+            if(length == capacity){
+                expansion();
+            }
+        }
+        T pop(){
+            if(length == 0){
+                throw EStackEmpty("Stack in Empty");
+            }
+            T temp = data[length - 1];
+            length--;
+            if(length + step + 1 < capacity){
+                reduction();
+            }
+            return temp;
+        }
+        ~Stack(){
+            delete[] data;
+        }
+        Stack& operator=(const Stack& st){
+            copy(st);
+            return *this;
+        }
+        const int& getLength() const{ return length;}
+        const int& getCapacity() const{ return capacity;}
+};
+
+class Person
 {
-	tos = 0;
-	cout << "Stack Initialized\n";
-}
+private:
+    string last_name;
+    string first_name;
+    string patronymic;
+public:
+    Person(){
+        last_name = "";
+        first_name = "";
+        patronymic = "";
+    }
+    Person(const Person& p){
+        last_name = p.last_name;
+        first_name = p.first_name;
+        patronymic = p.patronymic;
+    }
+    const string& getLastName() const { return last_name; }
+    const string& getFirstName() const { return first_name; }
+    const string& getPatronymic() const { return first_name; }
+    void setLastName(const std::string& st){
+        last_name = st;
+    }
+    void setFirstame(const std::string& st){
+        first_name = st;
+    }
+    void setPatronymic(const std::string& st){
+        patronymic = st;
+    }
+};
 
-// функция-деструктор stack
-template <class SType> stack<SType>::~stack()
+
+class PersonKeeper{
+    private:
+        static PersonKeeper *instance;
+        PersonKeeper(){}
+    public:
+        static PersonKeeper* getInstance(){
+            if(instance == nullptr){
+                instance = new PersonKeeper();
+            }
+            return instance;
+        }
+        Stack<Person> readPersons(ifstream& stream){
+            Stack<Person> stack;
+            Person temp;
+            std::ios_base::iostate s = stream.exceptions();
+            stream.exceptions(std::ios_base::eofbit);
+            while (true)
+            {
+                try{
+                    string st;
+                    stream >> st;
+                    temp.setFirstame(st);
+                    stream >> st;
+                    temp.setLastName(st);
+                    stream >> st;
+                    temp.setPatronymic(st);
+                    stack.push(temp);
+                }
+                catch(const std::ios_base::failure&) {
+                    break;
+                }
+            }
+            return stack;
+        }
+        void writePersons(ofstream& stream,const Stack<Person>& stack){
+            Stack<Person>stack_temp;
+            stack_temp = stack;
+            Person temp;
+            while(stack_temp.getLength() >0){
+                temp = stack_temp.pop();
+                stream << temp.getFirstName() << " " << temp.getLastName() << " " << temp.getPatronymic() << endl;
+            }
+        }
+};
+
+PersonKeeper* PersonKeeper::instance = nullptr;
+int main(int argc, char *argv[])
 {
-	cout << "Stack Destroyed\n";
-}
+    QCoreApplication a(argc, argv);
+    ifstream ifile("text.txt");
+    PersonKeeper* pK = PersonKeeper::getInstance();
+    Stack<Person> persons;
+    persons = pK->readPersons(ifile);
+    ifile.close();
+    ofstream ofile("new_text.txt");
+    pK->writePersons(ofile,persons);
+    ofile.close();
 
-// помещение объекта в стек
-template <class SType> void stack<SType>::push(SType i)
-{
-	if (tos == SIZE) {
-		cout << "Stack is full. \n";
-		return;
-	}
-	stck[tos] = i;
-	tos++;
-}
-// извлечение объекта из стека
-template <class SType> SType stack<SType>::pop()
-{
-	if (tos == 0) {
-		throw exception("Stack underflow.\n");		
-		return 0;
-	}
-	tos--;
-	return stck[tos];
-}
-
-template <class SType> SType stack<SType>::peek() 
-{
-	return tos;
-}
-
-int main()
-{
-	stack<int> a; // создание целочисленного стека
-	stack<double> b; // создание вещественного стека
-	stack<char> c; //создание символьного стека
-
-	// использование целого и вещественного стеков
-	a.push(1);
-	b.push(99.3);
-	a.push(2);
-	b.push(-12.23);
-	cout << a.peek() << " " << b.peek() << endl; // 2 2
-	cout << a.pop() << " ";
-	cout << a.pop() << "\n";
-	cout << a.peek() << " " << b.peek() << endl; // 0 2
-	cout << b.pop() << " ";
-	cout << b.pop() << "\n";
-
-	try {
-		cout << a.pop();
-	}
-	catch (exception x) {
-		cerr << x.what() << endl;
-	}
-			
-	// демонстрация символьного стека
-	for (int i = 0; i < 10; i++)
-	{
-		c.push('A' + i);
-	}
-
-	cout << endl << c.peek() << endl;
-
-	for (int i = 0; i < 10; i++)
-		cout << c.pop();
-	cout << endl;
-}
+    return a.exec();
+ }
