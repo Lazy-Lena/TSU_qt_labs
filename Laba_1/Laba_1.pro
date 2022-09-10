@@ -21,3 +21,7 @@ HEADERS += \
     exceptions.h \
     person.h \
     person_keeper.h
+
+DISTFILES += \
+    name.txt \
+    name_out.txt

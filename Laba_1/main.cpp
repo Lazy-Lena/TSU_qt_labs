@@ -25,9 +25,9 @@ int main()
     });
 
     cout << "Test 2:" << endl << "Check adding real data by pushing 3 values onto the stack - st2" << endl;
-    st2.Push(1.2398);
-    st2.Push(2.38);
-    st2.Push(9.048);
+    st2.Push(1.45);
+    st2.Push(3.567);
+    st2.Push(8.0956);
     cout << endl;
     cout<<"Stack output of type float: ";
     st2.Enum([&](const float &k){
@@ -35,9 +35,9 @@ int main()
     });
 
     cout << "Test 3:" << endl << "Check adding data of type by pushing 3 values on the stack - st3" << endl;
-    st3.Push("Vasilevich");
-    st3.Push("Ivan");
-    st3.Push("Ivanov");
+    st3.Push("Pogozheva");
+    st3.Push("Elena");
+    st3.Push("Olegovna");
 
     cout << endl;
     cout<<"Stack output of type string: ";
