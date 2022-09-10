@@ -19,4 +19,5 @@ HEADERS += \
     Stack.h \
     empty.h \
     exceptions.h \
-    person.h
+    person.h \
+    person_keeper.h
