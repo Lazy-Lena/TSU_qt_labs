@@ -1,193 +1,63 @@
 #include <QCoreApplication>
-#include <exception>
-#include<iostream>
-#include<cstring>
-#include<fstream>
-
+#include "Stack.h"
+#include <iostream>
+#include <cstring>
+#include <QString>
+#include "person_keeper.h"
+#include <QFile>
 using namespace std;
-
-class EStackEmpty
+//int main(int argc, char *argv[])
+int main()
 {
-private:
-    char* message;
-public:
-    EStackEmpty(const char* arg_message)
-    {
-        message = new char[strlen(arg_message)+1];
-        strcpy(message,arg_message);
-    }
-    EStackEmpty(const EStackEmpty& arg)
-    {
-        message = new char[strlen(arg.message)+1];
-        strcpy(message,arg.message);
-    }
-    ~EStackEmpty()
-    {
-        delete message;
-    }
-    const char* what() const { return message; }
-};
+    //QCoreApplication a(argc, argv);
+    Stack<int> st1;
+    Stack<float> st2;
+    Stack<string> st3;
+    cout << "Created three stacks of type, st1 - int, st2 - float, st3 - string" << endl;
+    cout << "Test 1:" << endl << "Check adding integer data by pushing 10 values from 0..9 onto the stack - st1" << endl;
 
-template <typename T>
-class Stack{
-    private:
-        T* data;
-        int capacity;
-        int length;
-        int step;
-        void expansion(){
-            capacity += step;
-            T* temp = new T[capacity];
-            for(int i = 0;i < length;i++){
-                temp[i] = data[i];
-            }
-            delete[] data;
-            data = temp;
-        }
-        void reduction(){
-            capacity -= step;
-            T* temp = new T[capacity];
-            for(int i = 0;i < length;i++){
-                temp[i] = data[i];
-            }
-            delete[] data;
-            data = temp;
-        }
-        void copy(const Stack& st){
-            delete[] data;
-            capacity = st.capacity;
-            length = st.length;
-            step = st.step;
-            data = new T[capacity];
-            for(int i = 0 ; i < length; i++){
-                data[i] = st.data[i];
-            }
-        }
-    public:
-        Stack(){
-            step = 10;
-            length = 0;
-            capacity = step;
-            data = new T[capacity];
-        }
-        void push(const T p){
-            length++;
-            data[length - 1] = p;
-            if(length == capacity){
-                expansion();
-            }
-        }
-        T pop(){
-            if(length == 0){
-                throw EStackEmpty("Stack in Empty");
-            }
-            T temp = data[length - 1];
-            length--;
-            if(length + step + 1 < capacity){
-                reduction();
-            }
-            return temp;
-        }
-        ~Stack(){
-            delete[] data;
-        }
-        Stack& operator=(const Stack& st){
-            copy(st);
-            return *this;
-        }
-        const int& getLength() const{ return length;}
-        const int& getCapacity() const{ return capacity;}
-};
-
-class Person
-{
-private:
-    string last_name;
-    string first_name;
-    string patronymic;
-public:
-    Person(){
-        last_name = "";
-        first_name = "";
-        patronymic = "";
+    for(int i=0;i<10;i++){
+        st1.Push(i);
     }
-    Person(const Person& p){
-        last_name = p.last_name;
-        first_name = p.first_name;
-        patronymic = p.patronymic;
-    }
-    const string& getLastName() const { return last_name; }
-    const string& getFirstName() const { return first_name; }
-    const string& getPatronymic() const { return first_name; }
-    void setLastName(const std::string& st){
-        last_name = st;
-    }
-    void setFirstame(const std::string& st){
-        first_name = st;
-    }
-    void setPatronymic(const std::string& st){
-        patronymic = st;
-    }
-};
+    cout<<"Stack output of type int: ";
+    st1.Enum([&](const int &k){
+        cout<<k<<" ";
+    });
 
+    cout << "Test 2:" << endl << "Check adding real data by pushing 3 values onto the stack - st2" << endl;
+    st2.Push(1.45);
+    st2.Push(3.567);
+    st2.Push(8.0956);
+    cout << endl;
+    cout<<"Stack output of type float: ";
+    st2.Enum([&](const float &k){
+        cout<<k<<" ";
+    });
 
-class PersonKeeper{
-    private:
-        static PersonKeeper *instance;
-        PersonKeeper(){}
-    public:
-        static PersonKeeper* getInstance(){
-            if(instance == nullptr){
-                instance = new PersonKeeper();
-            }
-            return instance;
-        }
-        Stack<Person> readPersons(ifstream& stream){
-            Stack<Person> stack;
-            Person temp;
-            std::ios_base::iostate s = stream.exceptions();
-            stream.exceptions(std::ios_base::eofbit);
-            while (true)
-            {
-                try{
-                    string st;
-                    stream >> st;
-                    temp.setFirstame(st);
-                    stream >> st;
-                    temp.setLastName(st);
-                    stream >> st;
-                    temp.setPatronymic(st);
-                    stack.push(temp);
-                }
-                catch(const std::ios_base::failure&) {
-                    break;
-                }
-            }
-            return stack;
-        }
-        void writePersons(ofstream& stream,const Stack<Person>& stack){
-            Stack<Person>stack_temp;
-            stack_temp = stack;
-            Person temp;
-            while(stack_temp.getLength() >0){
-                temp = stack_temp.pop();
-                stream << temp.getFirstName() << " " << temp.getLastName() << " " << temp.getPatronymic() << endl;
-            }
-        }
-};
+    cout << "Test 3:" << endl << "Check adding data of type by pushing 3 values on the stack - st3" << endl;
+    st3.Push("Pogozheva");
+    st3.Push("Elena");
+    st3.Push("Olegovna");
 
-PersonKeeper* PersonKeeper::instance = nullptr;
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
-    ifstream ifile("text.txt");
-    PersonKeeper* pK = PersonKeeper::getInstance();
-    Stack<Person> persons;
-    persons = pK->readPersons(ifile);
-    ifile.close();
-    ofstream ofile("new_text.txt");
-    pK->writePersons(ofile,persons);
-    ofile.close();
+    cout << endl;
+    cout<<"Stack output of type string: ";
+    st3.Enum([&](const string &k){
+        cout << k<<" ";
+    });
+    cout <<endl;
+    cout << "Test 4:" << endl << "Let's create two files, in the folder where the project is built, name.txt and name_out.txt" << endl;
+    PersonKeeper &persorKeep(PersonKeeper::Instance());
+    QString path1 = "name.txt";
+    QString path2 = "name_out.txt";
+    persorKeep.Clear(); // удаляем имена
+    cout << "Reading data from file name.txt" << endl;
+    persorKeep.ReadPersons(path1); // считываем имена из файла
+    cout << "We write data to the file name_out.txt that were read from the file name.txt" << endl;
+    persorKeep.WritePersons(path2); // записываем имена в файл
+    cout << "We open this file, we see that the data is all written" << endl;
 
-    return a.exec();
- }
+    cout << "Test 5: " << endl << "Let's throw an exception, for this we will create an empty stack and try to remove the last element" << endl;
+    Stack<int> st4;
+    st4.Pop();
+    //return 1;//a.exec();
+}
