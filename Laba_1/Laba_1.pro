@@ -18,4 +18,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Stack.h \
     empty.h \
-    exceptions.h
+    exceptions.h \
+    person.h
