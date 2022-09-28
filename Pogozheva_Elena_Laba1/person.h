@@ -10,7 +10,9 @@ public:
     Person(QString lastName, QString firstName, QString patronymic):
         _lastName(lastName),
         _firstName(firstName),
-        _patronymic(patronymic){ };
+        _patronymic(patronymic)
+    {
+    };
 
     Person(QString fullName);
 

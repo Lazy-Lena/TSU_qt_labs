@@ -23,7 +23,6 @@ public:
 
         // копируем сообщение об ошибке
         std::memcpy(_errorMessage, exception._errorMessage, strlen(exception._errorMessage));
-
     }
 
     // деструктор
@@ -38,6 +37,5 @@ public:
 private:
 
     char* _errorMessage;
-
 };
 #endif // EXCEPTION_H
