@@ -10,7 +10,9 @@ QtApplication {
         "exception.h",
         "person.h",
         "person.cpp",
-        "Stack.h"
+        "Stack.h",
+        "personkeeper.cpp",
+        "personkeeper.h"
     ]
 
     Group {     // Properties for the produced executable
